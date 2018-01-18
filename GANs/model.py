@@ -40,4 +40,33 @@ class NetG(nn.Module):
     def forward(self, input):
         return self.main(input)
 
-class
+class NetD(nn.Module):
+    def __init__(self, opt):
+        super(NetD, self).__init__()
+        ndf = opt.ndf
+        self.main = nn.Sequential(
+            #输入3*96*96
+            nn.Conv2d(3, ndf, 5, 3, 1, bias=False),
+            nn.LeakyReLU(0.2, inplace=True),
+            #输出 ndf*32*32
+
+            nn.Conv2d(ndf, ndf * 2, 4, 2, 1, bias=False),
+            nn.BatchNorm2d(ndf * 2),
+            nn.LeakyReLU(0.2, inplace=True),
+            #输出 ndf*2*16*16
+
+            nn.Conv2d(ndf * 2, ndf * 4, 4, 2, 1, bias=False),
+            nn.BatchNorm2d(ndf * 4),
+            nn.LeakyReLU(0.2, inplace=True),
+            #输出 ndf*4*8*8
+
+            nn.Conv2d(ndf * 4, ndf * 8, 4, 2, 1, bias=False),
+            nn.BatchNorm2d(ndf * 8),
+            nn.LeakyReLU(0.2, inplace=True),
+            # 输出 ndf*8*4*4
+
+            nn.Conv2d(ndf * 8, 1, 4, 1, 0, bias=False),
+            nn.Sigmoid() #输出0~1之间的概率值
+        )
+    def forward(self, input):
+        return self.main(input).view(-1)
